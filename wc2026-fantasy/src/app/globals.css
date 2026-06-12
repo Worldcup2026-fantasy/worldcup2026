@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+:root {
+  --pitch-green: #1a6b2e;
+  --brand-blue: #185fa5;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: #f8f9fa;
+}
+
+@layer components {
+  .pos-badge-GK  { @apply bg-amber-100 text-amber-800; }
+  .pos-badge-DEF { @apply bg-blue-100 text-blue-800; }
+  .pos-badge-MID { @apply bg-green-100 text-green-800; }
+  .pos-badge-FWD { @apply bg-red-100 text-red-800; }
+}
