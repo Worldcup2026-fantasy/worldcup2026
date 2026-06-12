@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 
-export default function LoginPage() {
+function LoginForm() {
   const router       = useRouter();
   const params       = useSearchParams();
   const next         = params.get("next") ?? "/squad";
@@ -116,5 +116,12 @@ export default function LoginPage() {
         </button>
       </p>
     </div>
+  );
+}
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="max-w-sm mx-auto px-4 py-24 text-center text-sm text-gray-400">Loading…</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
