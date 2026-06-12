@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { joinLeague } from "@/lib/leagues";
 import { useAuth } from "@/lib/useAuth";
 
-export default function JoinLeaguePage() {
+function JoinLeagueForm() {
   const params    = useSearchParams();
   const router    = useRouter();
   const { userId, loading: authLoading } = useAuth();
@@ -120,5 +120,12 @@ export default function JoinLeaguePage() {
         </button>
       </div>
     </div>
+  );
+}
+export default function JoinLeaguePage() {
+  return (
+    <Suspense fallback={<div className="max-w-sm mx-auto px-4 py-24 text-center text-sm text-gray-400">Loading…</div>}>
+      <JoinLeagueForm />
+    </Suspense>
   );
 }
