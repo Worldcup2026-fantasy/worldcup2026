@@ -19,6 +19,12 @@ function LoginForm() {
 
   const supabase = createClient();
 
+// If already logged in, go straight to destination
+useEffect(() => {
+  supabase.auth.getUser().then(({ data: { user } }) => {
+    if (user) window.location.href = next;
+  });
+}, []);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
