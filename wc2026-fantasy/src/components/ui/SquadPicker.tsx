@@ -37,12 +37,10 @@ export default function SquadPicker() {
 
   const locked = activeGw ? isDeadlinePassed(activeGw) : false;
 
-  // ── Redirect (middleware handles it server-side too) ──────────────
   useEffect(() => {
-    if (!authLoading && !userId) router.push("/auth/login?next=/squad");
+    if (!authLoading && !userId) { window.location.href = "/auth/login?next=/squad"; return; }
   }, [authLoading, userId, router]);
 
-  // ── Load players + active GW + saved squad in parallel ────────────
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
@@ -61,13 +59,12 @@ export default function SquadPicker() {
           ? "Transfers are locked for this gameweek."
           : "Squad loaded! Make changes then save.");
       } else {
-        setTip("Pick your 15 players within the $100m budget.");
+        setTip("Pick your 15 players within the $160m budget.");
       }
     }).catch(() => setTip("Error loading squad data."))
       .finally(() => setLoading(false));
   }, [userId]);
 
-  // ── Live countdown ticker ─────────────────────────────────────────
   useEffect(() => {
     if (!activeGw?.deadline) return;
     const tick = () => setCountdown(deadlineCountdown(activeGw));
@@ -76,10 +73,8 @@ export default function SquadPicker() {
     return () => clearInterval(id);
   }, [activeGw]);
 
-  // ── Mark dirty ────────────────────────────────────────────────────
   useEffect(() => { if (!loading) setIsDirty(true); }, [squad, formation]);
 
-  // ── Slot interactions ─────────────────────────────────────────────
   const handleSlotClick = useCallback((slotId: string, pos: string) => {
     if (locked) { setTip("Transfers locked. Gameweek deadline has passed."); return; }
     setActiveSlot(slotId);
@@ -98,7 +93,6 @@ export default function SquadPicker() {
     setTip("Captain set! Double points.");
   }, []);
 
-  // ── Add player ────────────────────────────────────────────────────
   const handleAdd = useCallback((player: Player) => {
     if (locked) { setTip("Transfers locked."); return; }
     if (isInSquad(squad, player.id)) return;
@@ -121,7 +115,6 @@ export default function SquadPicker() {
     setTip(`${player.name} added!`);
   }, [squad, activeSlot, formation, locked]);
 
-  // ── Formation change ──────────────────────────────────────────────
   const handleFormationChange = useCallback((f: Formation) => {
     if (locked) return;
     setFormation(f);
@@ -129,7 +122,6 @@ export default function SquadPicker() {
     setTip(`Formation → ${f}. Re-pick outfield.`);
   }, [locked]);
 
-  // ── Save ──────────────────────────────────────────────────────────
   const handleSave = async () => {
     if (!userId) return;
     if (locked) { setTip("Deadline passed — squad is locked."); return; }
@@ -156,7 +148,6 @@ export default function SquadPicker() {
 
   const remaining = budgetLeft(squad);
 
-  // ── Skeleton ──────────────────────────────────────────────────────
   if (authLoading || loading) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-6 animate-pulse">
@@ -174,7 +165,6 @@ export default function SquadPicker() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center shadow-md shadow-blue-500/20 flex-shrink-0">
@@ -188,7 +178,6 @@ export default function SquadPicker() {
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Deadline chip */}
           {countdown && (
             <span className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ${
               locked
@@ -217,13 +206,11 @@ export default function SquadPicker() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
-        {/* Left — Pitch */}
         <div className="flex flex-col gap-4">
           <Pitch formation={formation} squad={squad}
             onSlotClick={handleSlotClick} onRemove={handleRemove} onSetCaptain={handleSetCaptain} />
           <Bench squad={squad} onSlotClick={handleSlotClick} onRemove={handleRemove} />
 
-          {/* Tip */}
           <p className={`flex items-center justify-center gap-1.5 text-xs font-medium text-center rounded-xl py-2.5 px-4 ${
             locked ? "bg-rose-50 text-rose-500" : "bg-gray-50 text-gray-400"
           }`}>
@@ -231,7 +218,6 @@ export default function SquadPicker() {
             {tip || "Tap an empty shirt to pick a player"}
           </p>
 
-          {/* Unsaved indicator */}
           {isDirty && squad.length > 0 && !locked && saveState === "idle" && (
             <p className="flex items-center justify-center gap-1.5 text-xs font-bold text-center text-amber-600 bg-amber-50 rounded-xl py-2.5 px-4">
               <AlertCircle className="w-3.5 h-3.5" strokeWidth={2.5} />
@@ -239,7 +225,6 @@ export default function SquadPicker() {
             </p>
           )}
 
-          {/* Actions */}
           <div className="flex gap-3">
             <button onClick={handleReset} disabled={locked}
               className="tap-scale flex-1 flex items-center justify-center gap-1.5 py-3 rounded-2xl bg-white border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
@@ -266,7 +251,6 @@ export default function SquadPicker() {
           </div>
         </div>
 
-        {/* Right — Controls */}
         <div className="flex flex-col gap-4">
           <BudgetBar remaining={remaining} picked={squad.length} total={SQUAD_SIZE} />
           <FormationPicker current={formation} onChange={handleFormationChange} />
