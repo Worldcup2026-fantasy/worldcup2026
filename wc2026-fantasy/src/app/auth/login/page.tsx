@@ -31,7 +31,8 @@ function LoginForm() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        router.push(next);
+        window.location.href = next;
+        return;
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
