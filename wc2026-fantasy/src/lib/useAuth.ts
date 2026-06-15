@@ -5,21 +5,21 @@ import { createClient } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser]       = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    // Get the current session immediately
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user ?? null);
       setLoading(false);
     });
 
-    // Subscribe to auth changes (login, logout, token refresh)
+    // Listen for any auth state changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setUser(session?.user ?? null);
         setLoading(false);
       }
@@ -28,5 +28,9 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  return { user, userId: user?.id ?? null, loading };
+  return {
+    user,
+    userId: user?.id ?? null,
+    loading,
+  };
 }
